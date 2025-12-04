@@ -16,6 +16,7 @@ type Config struct {
 	MaxOpenConns    int           // Максимальное количество открытых соединений
 	MaxIdleConns    int           // Максимальное количество простаивающих соединений
 	ConnMaxIdleTime time.Duration // Максимальное время жизни простаивающего соединения
+	ConnMaxLifetime time.Duration // Максимальное время жизни соединения
 }
 
 // NewConnection инициализирует и возвращает пул соединений с PostgreSQL.
@@ -30,6 +31,9 @@ func NewConnection(cfg Config) (*sql.DB, error) {
 	if cfg.ConnMaxIdleTime == 0 {
 		cfg.ConnMaxIdleTime = 5 * time.Minute
 	}
+	if cfg.ConnMaxLifetime == 0 {
+		cfg.ConnMaxLifetime = 2 * time.Hour
+	}
 
 	db, err := sql.Open("postgres", cfg.DSN)
 	if err != nil {
@@ -40,6 +44,7 @@ func NewConnection(cfg Config) (*sql.DB, error) {
 	db.SetMaxOpenConns(cfg.MaxOpenConns)
 	db.SetMaxIdleConns(cfg.MaxIdleConns)
 	db.SetConnMaxIdleTime(cfg.ConnMaxIdleTime)
+	db.SetConnMaxLifetime(cfg.ConnMaxLifetime)
 
 	// Проверяем соединение с базой данных с таймаутом
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
