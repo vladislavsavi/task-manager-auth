@@ -41,7 +41,7 @@ func main() {
 
 	handlers.RegisterRoutes(router, db)
 
-	slog.Info(fmt.Sprintf("Starting server at http://localhost%s", appCfg.ServerPort))
+	slog.Info(fmt.Sprintf("Starting server on port %s", appCfg.ServerPort))
 	if err := http.ListenAndServe(appCfg.ServerPort, router); err != nil {
 		slog.Error("server failed to start", "error", err)
 		os.Exit(1)
